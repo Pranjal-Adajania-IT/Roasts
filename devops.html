@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Git, GitHub, SSH and Docker commands</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+:root{--bg:#E9EEF4;--ink:#0F1B2D;--mute:#4B5B70;--strip:#12263A;--strip-ink:#E8F1F8;--tag:#FFC93C;--tag-ink:#12263A;--line:#C3CFDC;--link:#1D4ED8}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0C1520;--ink:#E6EDF5;--mute:#93A4B8;--strip:#16283B;--line:#243649;--link:#8DB4FF}}
+:root[data-theme="dark"]{--bg:#0C1520;--ink:#E6EDF5;--mute:#93A4B8;--strip:#16283B;--line:#243649;--link:#8DB4FF}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light dark}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 16px);scroll-behavior:smooth}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 1rem/1.6 "Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1040px;margin:0 auto;padding:32px 20px 64px;display:grid;grid-template-columns:200px minmax(0,1fr);gap:40px}
+nav{position:sticky;top:24px;align-self:start}
+nav b{display:block;font-weight:800;font-size:1.1rem;line-height:1.2;margin-bottom:14px}
+nav a{display:block;color:var(--ink);text-decoration:none;padding:6px 0 6px 12px;border-left:3px solid var(--line)}
+nav a:hover,nav a:focus-visible{border-left-color:var(--tag);outline:none}
+header{margin-bottom:8px}
+h1{font-weight:800;font-size:clamp(2rem,5vw,3.2rem);line-height:1.05;letter-spacing:-.02em;margin:0 0 12px}
+header p{max-width:60ch;color:var(--mute);margin:0 0 6px}
+section{counter-reset:step;margin-top:48px}
+h2{font-weight:800;font-size:1.6rem;letter-spacing:-.01em;margin:0 0 4px}
+section>p.lead{color:var(--mute);margin:0 0 16px;max-width:62ch}
+h3{font-weight:600;font-size:1.05rem;margin:28px 0 6px}
+.c{display:grid;grid-template-columns:2.4rem minmax(0,1fr) auto;background:var(--strip);border-radius:6px;margin:6px 0;overflow:hidden}
+.c::before{counter-increment:step;content:counter(step);background:var(--tag);color:var(--tag-ink);font:700 .8rem "JetBrains Mono",monospace;display:grid;place-items:center}
+.c code{display:block;color:var(--strip-ink);padding:11px 14px;white-space:pre;overflow-x:auto;font:500 .85rem/1.55 "JetBrains Mono",ui-monospace,Menlo,Consolas,monospace}
+.c button{border:0;background:transparent;color:var(--tag);font:600 .8rem "Bricolage Grotesque",system-ui,sans-serif;padding:0 16px;cursor:pointer}
+.c button:hover{text-decoration:underline}
+.c button:focus-visible{outline:2px solid var(--tag);outline-offset:-4px}
+.c.ok button{color:#7CE3A1}
+p.n{margin:2px 0 10px 2.4rem;color:var(--mute);font-size:.92rem}
+p.n code,.lead code,.s code{font:500 .85em "JetBrains Mono",monospace}
+.warn{border-left:4px solid var(--tag);padding:2px 0 2px 14px;margin:16px 0;max-width:66ch}
+.exp{margin-top:32px;counter-reset:es}
+.s{position:relative;padding-left:2.4rem;margin:16px 0 6px}
+.s::before{counter-increment:es;content:counter(es);position:absolute;left:0;top:1px;width:1.7rem;height:1.7rem;border-radius:50%;background:var(--tag);color:var(--tag-ink);font:700 .8rem "JetBrains Mono",monospace;display:grid;place-items:center}
+.s em{font-style:normal;font-weight:600;border-bottom:2px solid var(--tag)}
+.s a,.fix a,.lead a{color:var(--link)}
+.c.q{grid-template-columns:minmax(0,1fr) auto;margin-left:2.4rem}
+.c.q::before{display:none}
+.fix{margin:6px 0 0;padding-left:1.2rem;max-width:66ch;color:var(--mute)}
+.fix code{font:500 .85em "JetBrains Mono",monospace}
+@media (max-width:780px){.wrap{grid-template-columns:minmax(0,1fr);gap:8px;padding-top:20px}nav{position:static;display:flex;flex-wrap:wrap;gap:6px 14px}nav b{width:100%;margin-bottom:4px}nav a{border-left:0;border-bottom:3px solid var(--line);padding:4px 0}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav aria-label="Sections">
+<b>Commands</b>
+<a href="#steps">Experiment steps</a>
+<a href="#git">Git basics</a>
+<a href="#github">GitHub</a>
+<a href="#ssh">SSH key</a>
+<a href="#multi">Multiple SSH</a>
+<a href="#docker">Docker form</a>
+</nav>
+<main>
+<header>
+<h1>Git, GitHub, SSH and Docker</h1>
+<p>Every command has a Copy button. Copy one, paste it into your terminal, press Enter, then move to the next. The numbers show the order within each section.</p>
+<p class="warn">Replace USERNAME, REPO, Your Name and you@example.com with your own details. The commands are written for Git Bash, Linux, macOS and WSL terminals.</p>
+</header>
+
+<section id="steps">
+<h2>Experiment step by step</h2>
+<p class="lead">Do the experiments in this order: Git, SSH, GitHub, Multiple SSH, then Docker. Steps marked “In the browser” can’t be done from the command line, so do them by hand. Only the essential commands are shown here; the full lists are in the sections below.</p>
+
+<div class="exp">
+<h3>Experiment 1: Create a Git repo and commit</h3>
+<div class="s">Open a terminal (Git Bash, Linux, macOS or WSL) and check that Git is installed.</div>
+<div class="c q"><code>git --version</code></div>
+<div class="s">Set your name, email and default branch.</div>
+<div class="c q"><code>git config --global user.name "Your Name" &amp;&amp; git config --global user.email "you@example.com" &amp;&amp; git config --global init.defaultBranch main</code></div>
+<div class="s">Create a folder and start the repo.</div>
+<div class="c q"><code>mkdir exp-git &amp;&amp; cd exp-git &amp;&amp; git init</code></div>
+<div class="s">Create a file, stage it and commit.</div>
+<div class="c q"><code>echo "Hello Git" &gt; hello.txt &amp;&amp; git add . &amp;&amp; git commit -m "first commit"</code></div>
+<div class="s">Check the commit.</div>
+<div class="c q"><code>git log --oneline</code></div>
+<p class="n">Output: one line with a commit ID and “first commit”.</p>
+<div class="s">Create a branch, make a change and merge it into main.</div>
+<div class="c q"><code>git switch -c feature-1 &amp;&amp; echo "feature" &gt;&gt; hello.txt &amp;&amp; git add . &amp;&amp; git commit -m "feature work" &amp;&amp; git switch main &amp;&amp; git merge feature-1</code></div>
+<p class="n">Output: “Fast-forward” is printed. Experiment 1 is done.</p>
+</div>
+
+<div class="exp">
+<h3>Experiment 2: Create an SSH key and connect it to GitHub</h3>
+<div class="s">Check that SSH is installed.</div>
+<div class="c q"><code>ssh -V</code></div>
+<div class="s">Generate a key.</div>
+<div class="c q"><code>ssh-keygen -t ed25519 -C "you@example.com"</code></div>
+<p class="n">Press Enter three times to accept the default path and skip the passphrase.</p>
+<div class="s">Start the SSH agent and add the key.</div>
+<div class="c q"><code>eval "$(ssh-agent -s)" &amp;&amp; ssh-add ~/.ssh/id_ed25519</code></div>
+<div class="s">Print the public key and copy the whole line.</div>
+<div class="c q"><code>cat ~/.ssh/id_ed25519.pub</code></div>
+<p class="n">The line starts with ssh-ed25519 and ends with your email.</p>
+<div class="s"><em>In the browser</em>, open github.com. Click your profile photo, then Settings, SSH and GPG keys, New SSH key. Enter a title (for example My Laptop), paste the key and click Add SSH key.</div>
+<div class="s">Test the connection.</div>
+<div class="c q"><code>ssh -T git@github.com</code></div>
+<p class="n">Type yes the first time. Output: Hi USERNAME! You’ve successfully authenticated. Experiment 2 is done.</p>
+</div>
+
+<div class="exp">
+<h3>Experiment 3: Push a repo to GitHub</h3>
+<div class="s"><em>In the browser</em>, go to github.com and click New repository. Name it REPO, leave README and .gitignore unticked, and click Create repository.</div>
+<div class="s">In the terminal, go to the folder from Experiment 1.</div>
+<div class="c q"><code>cd exp-git</code></div>
+<div class="s">Add the remote and push.</div>
+<div class="c q"><code>git branch -M main &amp;&amp; git remote add origin git@github.com:USERNAME/REPO.git &amp;&amp; git push -u origin main</code></div>
+<div class="s"><em>In the browser</em>, refresh the repo page.</div>
+<p class="n">Output: hello.txt is listed, along with the commit count.</p>
+<div class="s">Clone the repo into a new folder to prove it really is on GitHub.</div>
+<div class="c q"><code>cd .. &amp;&amp; git clone git@github.com:USERNAME/REPO.git exp-clone &amp;&amp; ls exp-clone</code></div>
+<p class="n">Output: hello.txt is listed. Experiment 3 is done.</p>
+</div>
+
+<div class="exp">
+<h3>Experiment 4: Multiple SSH keys (personal and work)</h3>
+<div class="s">Have both GitHub accounts ready, personal and work. You will need to log in to each.</div>
+<div class="s">Generate two separate keys.</div>
+<div class="c q"><code>ssh-keygen -t ed25519 -C "personal@example.com" -f ~/.ssh/id_ed25519_personal -N "" &amp;&amp; ssh-keygen -t ed25519 -C "work@example.com" -f ~/.ssh/id_ed25519_work -N ""</code></div>
+<div class="s">Add both keys to the agent.</div>
+<div class="c q"><code>eval "$(ssh-agent -s)" &amp;&amp; ssh-add ~/.ssh/id_ed25519_personal ~/.ssh/id_ed25519_work &amp;&amp; ssh-add -l</code></div>
+<div class="s">Print the personal public key.</div>
+<div class="c q"><code>cat ~/.ssh/id_ed25519_personal.pub</code></div>
+<div class="s"><em>In the browser</em>, add this key to your personal GitHub account (same as step 5 of Experiment 2).</div>
+<div class="s">Print the work public key.</div>
+<div class="c q"><code>cat ~/.ssh/id_ed25519_work.pub</code></div>
+<div class="s"><em>In the browser</em>, add this key to your work GitHub account.</div>
+<div class="s">Create the config file. Copy the whole <code>cat &gt;&gt; ~/.ssh/config</code> block from the <a href="#multi">Multiple SSH section</a> in one go and paste it, then run this.</div>
+<div class="c q"><code>chmod 600 ~/.ssh/config</code></div>
+<div class="s">Test both connections.</div>
+<div class="c q"><code>ssh -T git@github-personal; ssh -T git@github-work</code></div>
+<p class="n">Output: a Hi message with your personal username first, then your work username. The <code>;</code> is deliberate: GitHub’s test returns exit code 1 even on success, so <code>&amp;&amp;</code> would skip the second test.</p>
+<div class="s">When cloning, use the Host name instead of github.com.</div>
+<div class="c q"><code>git clone git@github-work:ORG/REPO.git</code></div>
+<p class="n">Experiment 4 is done.</p>
+</div>
+
+<div class="exp">
+<h3>Experiment 5: Run an HTML form in Docker</h3>
+<div class="s">Start Docker Desktop (Windows or macOS), then run the test image.</div>
+<div class="c q"><code>docker run hello-world</code></div>
+<p class="n">Output: Hello from Docker!</p>
+<div class="s">Create a folder.</div>
+<div class="c q"><code>mkdir docker-form &amp;&amp; cd docker-form</code></div>
+<div class="s">Run the three <code>cat</code> commands from the <a href="#docker">Docker form section</a>: index.html, style.css and Dockerfile. Then check the files.</div>
+<div class="c q"><code>ls</code></div>
+<p class="n">Output: Dockerfile, index.html and style.css should all be listed.</p>
+<div class="s">Build the image.</div>
+<div class="c q"><code>docker build -t form-site .</code></div>
+<div class="s">Start the container.</div>
+<div class="c q"><code>docker run -d -p 8080:80 --name form-container form-site</code></div>
+<div class="s"><em>In the browser</em>, open http://localhost:8080. The form appears.</div>
+<div class="s">Check that the container is running.</div>
+<div class="c q"><code>docker ps</code></div>
+<p class="n">Output: form-container is listed with Up status.</p>
+<div class="s">Clean up when you’re done.</div>
+<div class="c q"><code>docker rm -f form-container</code></div>
+<p class="n">Experiment 5 is done.</p>
+</div>
+
+<h3>If you get an error</h3>
+<ul class="fix">
+<li><code>Permission denied (publickey)</code>: the key isn’t added on GitHub, or <code>ssh-add</code> wasn’t run. Run <code>ssh-add</code> again and check the key on GitHub.</li>
+<li><code>Could not resolve hostname github-work</code>: the Host name in <code>~/.ssh/config</code> is wrong, or the config wasn’t saved.</li>
+<li><code>remote origin already exists</code>: run <code>git remote set-url origin git@github.com:USERNAME/REPO.git</code>.</li>
+<li><code>port is already allocated</code>: 8080 is busy. Use <code>-p 8081:80</code> and open localhost:8081.</li>
+<li><code>permission denied</code> (Docker on Linux): put <code>sudo</code> in front of the command.</li>
+</ul>
+</section>
+
+<section id="git">
+<h2>Git basics</h2>
+<p class="lead">Install check, one-time setup and everyday commands.</p>
+<div class="c"><code>git --version</code></div>
+<p class="n">If a version number appears, Git is installed.</p>
+<div class="c"><code>git config --global user.name "Your Name"</code></div>
+<div class="c"><code>git config --global user.email "you@example.com"</code></div>
+<div class="c"><code>git config --global init.defaultBranch main</code></div>
+<div class="c"><code>git config --list</code></div>
+<div class="c"><code>mkdir my-project &amp;&amp; cd my-project</code></div>
+<div class="c"><code>git init</code></div>
+<div class="c"><code>echo "# My Project" &gt; README.md</code></div>
+<div class="c"><code>git status</code></div>
+<div class="c"><code>git add .</code></div>
+<div class="c"><code>git commit -m "first commit"</code></div>
+<div class="c"><code>git log --oneline</code></div>
+<h3>Branch and merge</h3>
+<div class="c"><code>git switch -c feature-1</code></div>
+<p class="n">Creates a new branch and switches to it. Edit a file here, then add and commit.</p>
+<div class="c"><code>git branch</code></div>
+<div class="c"><code>git switch main</code></div>
+<div class="c"><code>git merge feature-1</code></div>
+<div class="c"><code>git branch -d feature-1</code></div>
+<h3>Fixing mistakes</h3>
+<div class="c"><code>git diff</code></div>
+<div class="c"><code>git restore FILE_NAME</code></div>
+<p class="n">Discards the uncommitted changes in that file.</p>
+<div class="c"><code>git reset --soft HEAD~1</code></div>
+<p class="n">Undoes the last commit and keeps the changes staged.</p>
+<div class="c"><code>git stash</code></div>
+<div class="c"><code>git stash pop</code></div>
+</section>
+
+<section id="github">
+<h2>GitHub</h2>
+<p class="lead">First create a new empty repo on github.com (don’t add a README). You need an SSH key set up, which is covered in the next section.</p>
+<div class="c"><code>git branch -M main</code></div>
+<div class="c"><code>git remote add origin git@github.com:USERNAME/REPO.git</code></div>
+<div class="c"><code>git remote -v</code></div>
+<div class="c"><code>git push -u origin main</code></div>
+<div class="c"><code>git pull origin main</code></div>
+<div class="c"><code>git fetch origin</code></div>
+<div class="c"><code>git push origin feature-1</code></div>
+<p class="n">After pushing a branch you can open a Pull Request on GitHub.</p>
+<h3>Getting a repo onto your machine</h3>
+<div class="c"><code>git clone git@github.com:USERNAME/REPO.git</code></div>
+<div class="c"><code>cd REPO</code></div>
+<div class="c"><code>git remote set-url origin git@github.com:USERNAME/NEW_REPO.git</code></div>
+<p class="n">Use this when you need to change the remote URL.</p>
+</section>
+
+<section id="ssh">
+<h2>SSH key (one account)</h2>
+<p class="lead">Create a key once, add it to GitHub, and pushes work without a password.</p>
+<div class="c"><code>ssh -V</code></div>
+<div class="c"><code>ssh-keygen -t ed25519 -C "you@example.com"</code></div>
+<p class="n">Press Enter at the path prompt. The passphrase is optional.</p>
+<div class="c"><code>eval "$(ssh-agent -s)"</code></div>
+<div class="c"><code>ssh-add ~/.ssh/id_ed25519</code></div>
+<div class="c"><code>cat ~/.ssh/id_ed25519.pub</code></div>
+<p class="n">Copy the full output. On GitHub go to Settings, SSH and GPG keys, New SSH key, and paste it.</p>
+<div class="c"><code>ssh -T git@github.com</code></div>
+<p class="n">Type yes the first time. If you see Hi USERNAME!, it worked.</p>
+<h3>SSH into a server</h3>
+<div class="c"><code>ssh user@SERVER_IP</code></div>
+<div class="c"><code>ssh-copy-id user@SERVER_IP</code></div>
+<div class="c"><code>ssh -i ~/.ssh/KEY_NAME user@SERVER_IP</code></div>
+</section>
+
+<section id="multi">
+<h2>Multiple SSH (personal and work)</h2>
+<p class="lead">Two GitHub accounts, two separate keys, one config file. The <code>-f</code> flag gives each key its own file name.</p>
+<div class="c"><code>ssh-keygen -t ed25519 -C "personal@example.com" -f ~/.ssh/id_ed25519_personal</code></div>
+<div class="c"><code>ssh-keygen -t ed25519 -C "work@example.com" -f ~/.ssh/id_ed25519_work</code></div>
+<div class="c"><code>eval "$(ssh-agent -s)"</code></div>
+<div class="c"><code>ssh-add ~/.ssh/id_ed25519_personal</code></div>
+<div class="c"><code>ssh-add ~/.ssh/id_ed25519_work</code></div>
+<div class="c"><code>ssh-add -l</code></div>
+<div class="c"><code>cat ~/.ssh/id_ed25519_personal.pub</code></div>
+<p class="n">Add this one to your personal GitHub account.</p>
+<div class="c"><code>cat ~/.ssh/id_ed25519_work.pub</code></div>
+<p class="n">Add this one to your work GitHub account.</p>
+<div class="c"><code>cat &gt;&gt; ~/.ssh/config &lt;&lt; 'EOF'
+Host github-personal
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/id_ed25519_personal
+  IdentitiesOnly yes
+
+Host github-work
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/id_ed25519_work
+  IdentitiesOnly yes
+EOF</code></div>
+<p class="n">This is a single command, so copy the whole block at once.</p>
+<div class="c"><code>chmod 600 ~/.ssh/config</code></div>
+<div class="c"><code>ssh -T git@github-personal</code></div>
+<div class="c"><code>ssh -T git@github-work</code></div>
+<h3>Using the repos</h3>
+<div class="c"><code>git clone git@github-personal:USERNAME/REPO.git</code></div>
+<p class="n">Write the Host name in place of github.com. That is the whole trick.</p>
+<div class="c"><code>git clone git@github-work:ORG/REPO.git</code></div>
+<div class="c"><code>git remote set-url origin git@github-work:ORG/REPO.git</code></div>
+<p class="n">Use this to switch the account of a repo you already cloned.</p>
+<div class="c"><code>git config user.name "Work Name"</code></div>
+<div class="c"><code>git config user.email "work@example.com"</code></div>
+<p class="n">Run these only inside that repo so its commits carry the right identity.</p>
+</section>
+
+<section id="docker">
+<h2>Docker: run an HTML form</h2>
+<p class="lead">A plain HTML and CSS form served from an nginx container. There is no backend, so the form uses mailto and opens your mail app to send the message.</p>
+<div class="c"><code>docker --version</code></div>
+<div class="c"><code>docker run hello-world</code></div>
+<p class="n">This checks that Docker is working.</p>
+<div class="c"><code>mkdir docker-form &amp;&amp; cd docker-form</code></div>
+<div class="c"><code>cat &gt; index.html &lt;&lt; 'EOF'
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+&lt;meta charset="UTF-8"&gt;
+&lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+&lt;title&gt;Contact Form&lt;/title&gt;
+&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;form action="mailto:you@example.com" method="post" enctype="text/plain"&gt;
+&lt;h1&gt;Contact us&lt;/h1&gt;
+&lt;label&gt;Name &lt;input type="text" name="name" required&gt;&lt;/label&gt;
+&lt;label&gt;Email &lt;input type="email" name="email" required&gt;&lt;/label&gt;
+&lt;label&gt;Message &lt;textarea name="message" rows="4" required&gt;&lt;/textarea&gt;&lt;/label&gt;
+&lt;button type="submit"&gt;Send message&lt;/button&gt;
+&lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+EOF</code></div>
+<p class="n">Replace you@example.com with your own email.</p>
+<div class="c"><code>cat &gt; style.css &lt;&lt; 'EOF'
+body{font-family:Arial,sans-serif;background:#f2f4f8;display:grid;place-items:center;min-height:100vh;margin:0}
+form{background:#fff;padding:24px;border-radius:8px;width:320px;display:grid;gap:12px}
+label{display:grid;gap:4px;font-size:14px}
+input,textarea{padding:8px;border:1px solid #ccc;border-radius:4px;font:inherit}
+button{padding:10px;border:0;background:#2563eb;color:#fff;border-radius:4px;cursor:pointer}
+EOF</code></div>
+<div class="c"><code>cat &gt; Dockerfile &lt;&lt; 'EOF'
+FROM nginx:alpine
+COPY . /usr/share/nginx/html
+EOF</code></div>
+<div class="c"><code>docker build -t form-site .</code></div>
+<div class="c"><code>docker run -d -p 8080:80 --name form-container form-site</code></div>
+<p class="n">Open http://localhost:8080 in your browser.</p>
+<h3>Managing the container</h3>
+<div class="c"><code>docker ps</code></div>
+<div class="c"><code>docker logs form-container</code></div>
+<div class="c"><code>docker stop form-container</code></div>
+<div class="c"><code>docker start form-container</code></div>
+<div class="c"><code>docker rm -f form-container</code></div>
+<p class="n">After editing the HTML or CSS, run this command, then build and run again.</p>
+<div class="c"><code>docker images</code></div>
+<div class="c"><code>docker rmi form-site</code></div>
+<h3>Push to Docker Hub (optional)</h3>
+<div class="c"><code>docker login</code></div>
+<div class="c"><code>docker tag form-site DOCKERHUB_USERNAME/form-site:latest</code></div>
+<div class="c"><code>docker push DOCKERHUB_USERNAME/form-site:latest</code></div>
+</section>
+</main>
+</div>
+<script>
+document.querySelectorAll('.c').forEach(function(row){
+  var b=document.createElement('button');
+  b.type='button';b.textContent='Copy';b.setAttribute('aria-label','Copy command');
+  row.appendChild(b);
+  b.addEventListener('click',async function(){
+    var t=row.querySelector('code').textContent;
+    try{await navigator.clipboard.writeText(t);}catch(e){
+      var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();
+      try{document.execCommand('copy');}catch(_){}
+      a.remove();
+    }
+    b.textContent='Copied';row.classList.add('ok');
+    setTimeout(function(){b.textContent='Copy';row.classList.remove('ok');},1400);
+  });
+});
+</script>
+</body>
+</html>
